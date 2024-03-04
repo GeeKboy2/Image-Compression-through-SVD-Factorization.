@@ -1,0 +1,61 @@
+\documentclass{article}
+
+\usepackage[french]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amssymb, amsmath, amsthm}
+
+%%%%%%%%%%%%%%%% Lengths %%%%%%%%%%%%%%%%
+\setlength{\textwidth}{15.5cm}
+\setlength{\evensidemargin}{0.5cm}
+\setlength{\oddsidemargin}{0.5cm}
+
+%%%%%%%%%%%%%%%% Variables %%%%%%%%%%%%%%%%
+\def\projet{3}
+\def\titre{Compression d'image par la factorisation SVD}
+\def\groupe{4}
+\def\equipe{1}
+\def\responsible{}
+\def\secretary{}
+\def\others{}
+
+\begin{document}
+
+%%%%%%%%%%%%%%%% Header %%%%%%%%%%%%%%%%
+\noindent\begin{minipage}{0.98\textwidth}
+	\vskip 0mm
+	\noindent
+	{ \begin{tabular}{p{7.5cm}}
+		{\bfseries \sffamily
+			Projet \projet} \\ 
+		{\itshape \titre}
+		\end{tabular}}
+	\hfill 
+	\fbox{\begin{tabular}{l}
+		{~\hfill \bfseries \sffamily Groupe \groupe\ - Equipe \equipe
+			\hfill~} \\[2mm] 
+		Responsable : \responsible \\
+		Secrétaire : \secretary \\
+		Codeurs : \others
+		\end{tabular}}
+	\vskip 4mm ~
+
+	~~~\parbox{0.95\textwidth}{\small \textit{Résumé~:} \sffamily
+		Ce projet a pour objectif d'effectuer des transformations sur les matrices. Les trois premières parties définissent quelques 
+		fonctions permettant de manipuler et de transformer des matrices normales en des matrices bidiagonales et diagonales. Ainsi, dans la dernière partie, ces 
+		transformations sont utilisées dans l'algorithme de compression d'images basé sur la transformation SVD.
+	}
+	\vskip 1mm ~
+\end{minipage}
+
+%%%%%%%%%%%%%%%% Main part %%%%%%%%%%%%%%%%
+
+\input{sections/section-1.tex}\label{sec1}
+
+\input{sections/section-2.tex}\label{sec2}
+
+\input{sections/section-3.tex}\label{sec3}
+
+\input{sections/section-4.tex}\label{sec4}
+
+\end{document}

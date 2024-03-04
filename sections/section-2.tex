@@ -1,0 +1,67 @@
+\section{Mise sous forme bidiagonale}
+Nous voulons transformer la matrice $A$ en une matrice bidiagonale en utilisant les fonctions \verb|compute_Q1| et \verb|compute_Q2|.
+En fait, les matrices $Q_1$ et $Q_2$ annulent les éléments en dessous de la diagonale et au-dessus de la première diagonale supérieure de la matrice $A$, par itérations.
+
+Ces fonctions font appel à la fonction \verb|householder|, qui est appelée sur des sous-matrices de la matrice de départ, pour obtenir la matrice bidiagonale.
+
+En fait, on résout par étapes l'équation \ref{eq:bidiagonalize}, avec $BD$ une matrice bidiagonale, et $Q_{left}$ et $Q_{right}$ des matrices obtenues,
+avec respectivement des produits des résultats de \verb|compute_Q1| et \verb|compute_Q2|.
+
+\begin{equation}
+	Q_{left} \times BD \times Q_{right} = A
+	\label{eq:bidiagonalize}
+\end{equation}
+
+La fonction \verb|bidiagonalize| renvoie alors ces matrices $Q_{left}$, $BD$ et $Q_{right}$.
+Pour montrer que cette fonction renvoie mathématiquement le bon résultat, il est nécessaire de prouver que les matrices $Q_1$ et $Q_2$ sont bien orthogonales et symétriques.
+
+\bigbreak
+\noindent\textbf{Démonstration :}
+Prouvons d'abord que ces matrices sont orthogonales.
+	Elles sont construites à partir de l'identité, et un bloc est modifié sur la diagonale pour y placer une matrice de Householder.
+	Il suffit donc de montrer que les matrices de Householder sont bien orthogonales :
+	\begin{align*}
+		H &= I - 2 \times N \times N^T\\
+		\Leftrightarrow H \times H^T &= (I - 2 \times N \times N^T) \times (I - 2 \times N \times N^T)\\
+		\Leftrightarrow H \times H^T &= I - 4 \times N \times N^T + 4 \times N \times \underbrace{N^T \times N}_{= 1} \times N^T = I
+	\end{align*}
+	
+	Ainsi, $H$ est bien orthogonale, et donc par produits par blocs dans les matrices, les matrices $Q_1$ et $Q_2$ sont orthogonales.
+	
+	Comme $N \times N^T$ est symétrique, alors $H = I - 2 \times N \times N^T$ aussi, et comme $H$ est insérée sur la diagonale d'une matrice carrée, 
+	alors la matrice globale (par exemple $Q_1$) est nécessairement symétrique.
+	Ainsi, $Q_1$ et $Q_2$ sont symétriques.
+\qedsymbol
+\bigbreak
+
+Maintenant, il reste à montrer que l'équation~\ref{eq:bidiagonalize} reste vérifiée à chaque itération.
+
+\bigbreak
+\noindent\textbf{Démonstration :}
+Montrons qu'à chaque itération, on conserve l'égalité $Q_{left} \times BD \times Q_{right} = A$, avec $Q_{left}$ et $Q_{right}$ des matrices orthogonales.
+
+	\medbreak\noindent
+	\textbf{Initialisation :} Pour commencer, on a $Q_{left} = I$, $Q_{right} = I$ et $BD = A$. 
+	Nécessairement, on a bien $Q_{left} \times BD \times Q_{right} = A$, avec $Q_{left}$ et $Q_{right}$ orthogonales.
+
+	\medbreak\noindent
+	\textbf{Hérédité :} Soit $k$ un entier dans $[|0, n - 1|]$. Supposons que l'invariant soit vérifié à la fin de l'itération $k$.
+	Montrons alors que l'égalité reste vérifiée pour l'itération $k + 1$.
+
+	L'algorithme consiste à multiplier $Q_{left}$ à droite par $Q_1$, puis $Q_{right}$ à gauche par $Q_2$, et enfin multiplier $BD$ à gauche par $Q_1$ et à droite par $Q_2$.
+
+	Les matrices $Q_{left}$ et $Q_{right}$ sont des matrices orthogonales par hypothèse, et les matrices $Q_1$ et $Q_2$ le sont aussi d'après la démonstration qui précède.
+	En utilisant l'hypothèse de récurrence, on a le résultat attendu :
+	\begin{equation*}
+		Q_{left} \times Q_1 \times Q_1 \times BD \times Q_2 \times Q_2 \times Q_{right} = Q_{left} \times BD \times Q_{right} = A
+	\end{equation*}
+
+	En effet, $Q_1$ et $Q_2$ sont orthogonales et symétriques d'après la preuve précédente, donc elles sont auto-inverses : $Q_1 = Q_1^T = Q_1^{-1}$ et $Q_2 = Q_2^T = Q_2^{-1}$,
+	ce qui donne $Q_1 \times Q_1 = I$ et $Q_2 \times Q_2 = I$.
+
+	Par produit de matrices orthogonales, $Q_{left}$ et $Q_{right}$ restent orthogonales : l'hérédité est prouvée.
+
+	\medbreak\noindent
+	\textbf{Conclusion :} $Q_{left} \times BD \times Q_{right} = A$, l'invariant est donc vérifié.
+\qedsymbol
+\bigbreak

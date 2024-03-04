@@ -1,0 +1,47 @@
+\section{Transformations de Householder}
+Le but de cette partie est de mettre en place les fonctions nécessaires pour l'utilisation des
+matrices de Householder, permettant de mettre en forme certaines matrices.
+
+\subsection{Construction d'une matrice de Householder}
+
+Pour la matrice de Householder, on a l'équation~\ref{eq:householder_matrix},
+où $H$ représente la matrice de Householder, puis $N$ un vecteur de taille $n$ et de norme euclidienne $1$.
+\begin{equation}
+	H = I - 2 \times N \times N^T
+	\label{eq:householder_matrix}
+\end{equation}
+
+On cherche à trouver comment choisir le vecteur $N$ afin que la matrice de Householder
+$H_{U,V}$ envoie $U$ sur $V$. On considère $U$ et $V$ deux vecteurs de même norme.
+Si $U^T \times N = 0$, on a $U = V$ et donc $H = I$.
+Sinon, on a $N$ colinéaire à $U - V$, et sa valeur est donnée par l'équation~\ref{eq:householder_n}.
+\begin{equation}
+	N=\pm \frac{U-V}{\|U-V\|}
+	\label{eq:householder_n}
+\end{equation}
+
+On a donc implémenté une fonction \verb|householder| permettant de calculer $N$ à l'aide de l'équation~\ref{eq:householder_n}, en traitant le cas éventuel où $U$ serait égal à $V$
+pour éviter une division par $0$.
+
+Cette fonction permet d'effectuer des changements de bases pour donner des matrices plus simples.
+Par exemple, on peut choisir un vecteur $V$ ne contenant qu'une seule valeur non-nulle, la norme de $U$ pour que les deux vecteurs aient la même norme, 
+et donc on a la matrice de passage pour le vecteur $U$ associé. C'est d'ailleurs ce que nous utilisons dans les parties suivantes.
+
+\subsection{Produits avec une matrice de Householder}
+
+Ensuite, on a cherché à écrire une fonction optimisée \verb|vector_product| qui calcule le produit d'une matrice de Householder par un vecteur.
+En utilisant la formule \ref{eq:householder_matrix}, et par produit avec une matrice colonne $X$, on a l'équation~\ref{eq:vector_product}.
+On remarque la présence du produit scalaire $N^T \times X$, ainsi le calcul de $H \times X$ se fait en $\mathcal{O}(n)$ au lieu de $\mathcal{O}(n^2)$.
+
+\begin{equation}
+	H \times X = X - 2 \times N \times \underbrace{N^T \times X}_{scalaire}
+	\label{eq:vector_product}
+\end{equation}
+
+Pour le produit entre une matrice de Householder et un ensemble de vecteurs, nous avons décidé de représenter l'ensemble de vecteurs comme une matrice.
+Cette matrice contient alors des vecteurs entre une colonne \verb|start| et une colonne \verb|end|, et des vecteurs nuls pour le reste.
+
+On a donc créé deux fonctions, \verb|matrix_product_left| et \verb|matrix_product_right|, qui toutes deux utilisent le même principe avec le produit scalaire.
+
+La complexité de ces deux fonctions est de $\mathcal{O}(n^2)$, puisqu'on effectue un produit scalaire sur $n$ vecteurs, 
+ce qui est bien meilleur qu'un produit matriciel classique de complexité $\mathcal{O}(n^3)$.

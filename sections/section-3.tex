@@ -1,0 +1,83 @@
+\section{Implémentation de la tranformation QR et de la SVD}
+Dans cette partie, nous allons transformer une matrice bidiagonale $BD$ en une matrice diagonale~$S$ par une méthode itérative,
+puis créer une fonction \verb|SVD| à partir des fonctions déjà créées.
+
+\subsection{Transformations QR}
+
+\bigbreak
+\noindent\textbf{Démonstration :}
+Montrons qu'à chaque tour de boucle, on conserve l'égalité $U \times S \times V = BD$, avec $U$ et $V$ des matrices orthogonales.
+	
+	\medbreak\noindent
+	\textbf{Initialisation :} Pour commencer, on a $U = I$, $V = I$ et $S = BD$. 
+	Nécessairement, on a bien $U \times S \times V = BD$, avec $U$ et $V$ orthogonales.
+
+	\medbreak\noindent
+	\textbf{Hérédité :} Soit $k$ un entier dans $[|0, N_{max} - 1|]$. Supposons que l'invariant soit vérifié à la fin de l'itération $k$.
+	Montrons alors que l'égalité reste vérifiée pour l'itération $k + 1$.
+
+	L'algorithme consiste à multiplier $U$ à droite par $Q_2$, puis $V$ à gauche par $Q_1^T$, 
+	et enfin remplacer $S$ par $R_2$.
+
+	Les matrices $U$ et $V$ sont des matrices orthogonales par hypothèse, et les matrices $Q_1$ et $Q_2$ le sont aussi puisqu'il s'agit d'une décomposition QR,
+	donc on a $Q_1 \times Q_1^T = I$ et $Q_2 \times Q_2^T = I$.
+
+	On a les égalités suivantes : $Q_1 \times R_1 = S^T$, et $Q_2 \times R_2 = R_1^T$
+	Comme $Q_2$ est orthogonale, et en utilisant que $(A \times B)^T = B^T \times A^T$, on a $R_2 = Q_2^T \times R_1^T$, et donc $R2 = Q_2^T \times S \times Q_1$.
+
+	En utilisant l'hypothèse de récurrence, on a bien le résultat recherché :
+	\begin{equation*}
+		U \times Q_2 \times R_2 \times Q_1^T \times V = U \times \underbrace{Q_2 \times Q_2^T}_{= I} \times S \times \underbrace{Q_1 \times Q_1^T}_{= I} \times V = U \times S \times V = BD
+	\end{equation*}
+	Par produit de matrices orthogonales, $U$ et $V$ restent orthogonales. 
+	Ainsi, l'hérédité est prouvée.
+
+	\medbreak\noindent
+	\textbf{Conclusion :} $U \times S \times V = BD$.
+\qedsymbol
+\bigbreak
+
+\bigbreak
+\noindent\textbf{Démonstration :}
+Montrons qu'à chaque tour de boucle les matrices $S$, $R_1$ et $R_2$ sont bidiagonales.
+
+	\medbreak\noindent
+	\textbf{Initialisation :} Au début, la matrice $S$ est une copie de la matrice bidiagonale $BD$, et les matrices $R_1$ et $R_2$ sont vides. 
+	L'initialisation est donc vérifiée.
+
+	\medbreak\noindent
+	\textbf{Hérédité :} Soit $k \in [|0, N_{max} - 1|]$. Supposons que la proposition soit vérifiée à l'itération $k$.
+	Montrons alors qu'elle reste vérifiée pour l'itération $k + 1$.
+
+	La matrice $R_1$ est mise à jour à partir de la matrice $S$ de l'itération $k$ en utilisant la \textit{factorisation~QR} ($S^T = Q_1 \times R_1$). Or la \textit{factorisation QR} 
+	conserve la structure des matrices, par conséquent $R_1$ est aussi bidiagonale. De la même manière, on montre que $R_2$ est aussi bidiagonale 
+	puisqu'elle est obtenue par \textit{factorisation QR} sur la matrice $R_1$ de l'itération $k + 1$ ($R_1^T = Q_2 \times R_2$).
+
+	Ensuite, la matrice $S$ est égale à $R_2$ de l'itération $k + 1$, elle est donc bidiagonale.
+	Ainsi, l'hérédité est prouvée.
+
+	\medbreak\noindent
+	\textbf{Conclusion :} Les matrices $S$, $R_1$ et $R_2$ restent bidiagonales à chaque itération.
+\qedsymbol
+\bigbreak
+
+La fonction \verb|QR| a une complexité de l'ordre de $\mathcal{O}(n^3)$.
+En effet, on utilise dans la boucle les fonctions \verb|matrix_product_right| et \verb|matrix_product_left|, qui ont des complexités de l'ordre de $\mathcal{O}(n^2)$.
+
+\subsection{Algorithme de la factorisation SVD}
+Avec les fonctions que nous avons implémentées, il est possible d'effectuer une factorisation SVD.
+Il suffit d'appliquer ceci : \verb|bidiagonalize(A)|, ce qui donne $A = Q_{left} \times BD \times Q_{right}$.
+Ensuite, on applique la seconde fonction sur $BD$ : \verb|U, S, V = diagonalize(BD)|, qui donne $BD = U \times S \times V$.
+L'équation \ref{eq:svd} montre alors la décomposition de $A$ en matrice diagonale.
+
+\begin{equation}
+	A = Q_{left} \times U \times S \times V \times Q_{right}
+	\label{eq:svd}
+\end{equation}
+
+Pour compléter notre fonction \verb|SVD|, nous avons ordonné les valeurs sur la diagonale de la matrice $S$ de manière décroissante, 
+en effectuant des permutations à la fois sur les lignes de la matrice $U$ et sur celles de $S$.
+
+Comme la fonction \verb|QR| est appelée à l'intérieur de la boucle présente dans la fonction \verb|diagonalize|, qui fait partie de la fonction \verb|SVD|,
+la complexité de la fonction \verb|SVD| est de l'ordre de $\mathcal{O}(n^4)$.
+Même si cette complexité est très élevée, elle permet d'avoir une stabilité numérique importante.
